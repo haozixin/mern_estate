@@ -16,10 +16,10 @@ export const signup = async (req, res, next) => {
     }
 
     try {
-
         // 3. Check if the user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
+            console.log('Email already registered');
             return res.status(409).json({ message: 'Email already registered' });
         }
 
@@ -41,6 +41,19 @@ export const signup = async (req, res, next) => {
             user: { username, email }
         });
     } catch (error) {
-        next()
+        console.log('Error creating user:', error);
+        
+        if (error.code === 11000) {
+
+            if (error.keyPattern && error.keyPattern.email) {
+                return res.status(409).json({ message: 'Email already registered' });
+            } else if (error.keyPattern && error.keyPattern.username) {
+                return res.status(409).json({ message: 'Username already taken' });
+            } else {
+                return res.status(409).json({ message: 'User already exists' });
+            }
+        }
+        
+        next(error);
     }
 }
