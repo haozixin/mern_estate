@@ -52,18 +52,34 @@ export default function SignUp() {
   };
 
   const handleSubmit = async () => {
-    
     if (!validateForm()) return;
     
     setIsLoading(true);
     
-    // 模拟API调用
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Registration data:', formData);
-      // Here you should call the actual API
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Registration failed');
+      }
+
+      const data = await response.json();
+      console.log('Registration successful:', data);
+      // Handle successful registration (e.g., redirect to login page)
+      
     } catch (error) {
       console.error('Registration failed:', error);
+      setErrors(prev => ({
+        ...prev,
+        submit: error.message
+      }));
     } finally {
       setIsLoading(false);
     }
