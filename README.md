@@ -1,18 +1,28 @@
-command I used:
-- `npm create vite@latest client`
-- `npm install`
-- `npm install tailwindcss @tailwindcss/vite` (https://tailwindcss.com/docs/installation/using-vite)
-- `npm run dev`
-- `npm i react-router-dom`
-- `npm init -y`
+# Developing ...
 
-Create the server:
-- Create an api folder in the root directory.
-- Run `npm i express` in the root directory.
-- Create an `index.js` file inside the api folder.
-- Install Nodemon: `npm i nodemon`
-- Add the following script to your `package.json`
 
-Connect to the database:
-- `npm i mongoose` in root directory.
-- `npm i dotenv` , use this tool to load env var in the file of .env . Example: `dotenv.config(); mongoose.connect(process.env.MONGODB)`,  add `.env` file to the root directory and add the MONGODB variable.
+---
+
+**Frontend (Client)**
+
+* **React:** Used for building user interfaces.
+* **React Router:** Handles client-side routing.
+* **Vite:** Provides fast build and development environment.
+* **Lucide-React:** Used for icons.
+* **CSS:** Used for styling and layout.
+
+**Backend (API)**
+
+* **Node.js:** Server-side runtime environment.
+* **Express:** Used to build RESTful APIs.
+* **Mongoose:** For interacting with MongoDB.
+* **MongoDB:** Used for database storage.
+* **JWT (jsonwebtoken):** For user authentication.
+* **Bcrypt:** For password encryption.
+* **dotenv:** For managing environment variables.
+* **cookie-parser:** For parsing cookies in HTTP requests.
+
+**Development Tools**
+
+* **Nodemon:** Automatically restarts the Node.js application.
+* **ESLint:** For code quality and style checking.
