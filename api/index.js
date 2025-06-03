@@ -27,7 +27,7 @@ const app = express();
 
 
 app.use(cors({
-  origin: 'mern-estate-jade.vercel.app', // 本地开发环境前端端口
+  origin: 'https://mern-estate-jade.vercel.app', // 本地开发环境前端端口
   credentials: true                // 如果你前端 fetch 带 cookie，需要这个
 }));
 
