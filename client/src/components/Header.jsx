@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Eye, EyeOff, Home, Mail, User, Lock, Menu, X, Search } from 'lucide-react'
+import { useSelector } from 'react-redux'
 import logo from '../assets/images/logo2.png'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useSelector(state => state.user);
 
   return (
     <>
@@ -17,7 +19,7 @@ export default function Header() {
         <div className="absolute inset-0 backdrop-blur-sm"></div>
         {/* 底部边框渐变 */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent opacity-50"></div>
-        
+
         <div className="relative max-w-7xl mx-auto h-full">
           <div className="flex items-center justify-between h-full px-4 sm:px-6">
             {/* Logo - 移动端和桌面端都显示 */}
@@ -63,12 +65,22 @@ export default function Header() {
               >
                 About
               </Link>
-              <Link
-                to="/signin"
-                className="font-medium text-gray-700 hover:text-blue-600 transition px-4 py-2 rounded-lg bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 hover:from-blue-300 hover:to-purple-300 shadow hover:scale-105 duration-300"
-              >
-                Sign in
-              </Link>
+              {user ? (
+                <Link to="/profile" className="flex items-center">
+                  <img
+                    src={user.avatar || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+                    alt="profile"
+                    className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md hover:scale-110 transition-transform duration-300"
+                  />
+                </Link>
+              ) : (
+                <Link
+                  to="/signin"
+                  className="font-medium text-gray-700 hover:text-blue-600 transition px-4 py-2 rounded-lg bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 hover:from-blue-300 hover:to-purple-300 shadow hover:scale-105 duration-300"
+                >
+                  Sign in
+                </Link>
+              )}
             </nav>
 
             {/* 移动端菜单按钮 */}
@@ -84,11 +96,10 @@ export default function Header() {
 
       {/* 移动端下拉菜单 - 独立于header，使用固定定位 */}
       <div
-        className={`fixed top-16 left-0 right-0 z-40 bg-white shadow-lg transform transition-transform duration-300 ease-in-out sm:hidden ${
-          isMenuOpen ? 'translate-y-0' : '-translate-y-full'
-        }`}
+        className={`fixed top-16 left-0 right-0 z-40 bg-white shadow-lg transform transition-transform duration-300 ease-in-out sm:hidden ${isMenuOpen ? 'translate-y-0' : '-translate-y-full'
+          }`}
       >
-        <nav className="flex flex-col p-4 space-y-2">
+        {/* <nav className="flex flex-col p-4 space-y-2">
           <Link
             to="/"
             className="block px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
@@ -103,14 +114,68 @@ export default function Header() {
           >
             About
           </Link>
+          {user ? (
+            <Link
+              to="/profile"
+              className="flex items-center px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <img
+                src={user.avatar || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+                alt="profile"
+                className="w-6 h-6 rounded-full object-cover mr-3 border border-gray-300"
+              />
+              Profile
+            </Link>
+          ) : (
+            <Link
+              to="/signin"
+              className="block px-4 py-3 rounded-lg font-medium text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-center shadow-md transition-all hover:shadow-lg"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Sign in
+            </Link>
+          )}
+        </nav> */}
+        <nav className="flex flex-col p-4 space-y-2">
           <Link
-            to="/signin"
-            className="block px-4 py-3 rounded-lg font-medium text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-center shadow-md transition-all hover:shadow-lg"
+            to="/"
+            className="block px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors text-center active:scale-95 active:bg-blue-100"
             onClick={() => setIsMenuOpen(false)}
           >
-            Sign in
+            Home
           </Link>
+          <Link
+            to="/about"
+            className="block px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors text-center active:scale-95 active:bg-blue-100"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            About
+          </Link>
+          {user ? (
+            <Link
+              to="/profile"
+              className="flex items-center justify-center px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors text-center active:scale-95 active:bg-blue-100"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <img
+                src={user.avatar || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+                alt="profile"
+                className="w-6 h-6 rounded-full object-cover mr-3 border border-gray-300"
+              />
+              Profile
+            </Link>
+          ) : (
+            <Link
+              to="/signin"
+              className="block px-4 py-3 rounded-lg font-medium text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-center shadow-md transition-all hover:shadow-lg active:scale-95 active:bg-blue-600/80"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Sign in
+            </Link>
+          )}
         </nav>
+
       </div>
 
       {/* 遮罩层 - 点击关闭菜单 */}
