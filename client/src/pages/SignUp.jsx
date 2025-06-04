@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Home, Mail, User, Lock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { OAuth } from '../components/OAuth.jsx';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -329,6 +330,13 @@ export default function SignUp() {
                     <span className="px-2 sm:px-4 bg-white text-gray-500">or</span>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Google OAuth Button - 隐藏当状态为成功时 */}
+            {submitStatus !== 'success' && (
+              <div className="mb-4 sm:mb-6">
+                <OAuth />
               </div>
             )}
 
