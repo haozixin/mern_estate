@@ -1,6 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Eye, EyeOff, Home, Mail, Lock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { 
+  signInUser, 
+  clearSubmitStatus,
+  selectLoading,
+  selectError,
+  selectSubmitStatus
+} from '../redux/userSlice';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
@@ -9,10 +17,26 @@ export default function SignIn() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(''); // '', 'success', 'error'
-  const [submitMessage, setSubmitMessage] = useState('');
+  
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  // 使用 selector functions 获取状态
+  const loading = useSelector(selectLoading);
+  const error = useSelector(selectError);
+  const submitStatus = useSelector(selectSubmitStatus);
+  const submitMessage = useSelector((state) => state.user.submitMessage);
+
+  // 监听提交状态变化
+  useEffect(() => {
+    if (submitStatus === 'success') {
+      // 2秒后跳转到首页
+      const timer = setTimeout(() => {
+        navigate('/');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [submitStatus, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,8 +53,7 @@ export default function SignIn() {
     }
     // Clear submit status when user starts typing
     if (submitStatus) {
-      setSubmitStatus('');
-      setSubmitMessage('');
+      dispatch(clearSubmitStatus());
     }
   };
 
@@ -56,57 +79,8 @@ export default function SignIn() {
   const handleSubmit = async () => {
     if (!validateForm()) return;
     
-    setIsLoading(true);
-    setSubmitStatus('');
-    setSubmitMessage('');
-    
-    // 确保至少显示1秒的加载状态
-    const startTime = Date.now();
-    
-    try {
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || `Login failed (${response.status})`);
-      }
-
-      // 确保至少1秒的加载时间
-      const elapsed = Date.now() - startTime;
-      if (elapsed < 1000) {
-        await new Promise(resolve => setTimeout(resolve, 1000 - elapsed));
-      }
-
-      console.log('Login successful:', data);
-      setSubmitStatus('success');
-      setSubmitMessage('Welcome back! Login successful!');
-      
-      // 2秒后跳转到首页
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
-      
-    } catch (error) {
-      // 确保至少1秒的加载时间
-      const elapsed = Date.now() - startTime;
-      if (elapsed < 1000) {
-        await new Promise(resolve => setTimeout(resolve, 1000 - elapsed));
-      }
-
-      console.error('Login failed:', error);
-      setSubmitStatus('error');
-      setSubmitMessage(error.message);
-      
-    } finally {
-      setIsLoading(false);
-    }
+    // 使用 Redux thunk action 处理登录
+    dispatch(signInUser(formData));
   };
 
   // 成功动画组件
@@ -194,7 +168,7 @@ export default function SignIn() {
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    disabled={isLoading || submitStatus === 'success'}
+                    disabled={loading || submitStatus === 'success'}
                     className={`w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 border-2 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed ${
                       errors.email ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 hover:border-gray-300'
                     }`}
@@ -221,7 +195,7 @@ export default function SignIn() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={handleChange}
-                    disabled={isLoading || submitStatus === 'success'}
+                    disabled={loading || submitStatus === 'success'}
                     className={`w-full pl-8 sm:pl-10 pr-9 sm:pr-12 py-2 sm:py-3 border-2 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed ${
                       errors.password ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 hover:border-gray-300'
                     }`}
@@ -230,7 +204,7 @@ export default function SignIn() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    disabled={isLoading || submitStatus === 'success'}
+                    disabled={loading || submitStatus === 'success'}
                     className="absolute inset-y-0 right-0 pr-2.5 sm:pr-3 flex items-center hover:text-blue-600 transition-colors disabled:opacity-50"
                   >
                     {showPassword ? (
@@ -249,11 +223,11 @@ export default function SignIn() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isLoading || submitStatus === 'success'}
+                disabled={loading || submitStatus === 'success'}
                 className={`w-full py-2 sm:py-3 px-4 rounded-lg sm:rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition-all duration-200 shadow-lg text-sm sm:text-base ${
                   submitStatus === 'success' 
                     ? 'bg-green-500 text-white cursor-not-allowed' 
-                    : isLoading 
+                    : loading 
                       ? 'bg-blue-400 text-white cursor-not-allowed' 
                       : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
                 }`}
@@ -263,7 +237,7 @@ export default function SignIn() {
                     <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                     <span>Login Successful!</span>
                   </div>
-                ) : isLoading ? (
+                ) : loading ? (
                   <div className="flex items-center justify-center">
                     <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
                     <span className="text-sm sm:text-base">Signing In...</span>
